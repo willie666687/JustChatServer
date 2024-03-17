@@ -4,19 +4,28 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import willie.Enum.ClientStatus;
 import willie.Enum.ConnectionMessageType;
+import willie.impl.Client;
 import willie.impl.ConnectionMessage;
+import willie.util.ClientsManager;
+import willie.util.DebugOutput;
+import willie.util.KeyUtils;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+
 @ChannelHandler.Sharable
 public class ConnectionMessageHandler extends ChannelInboundHandlerAdapter{
-	Set<ChannelHandlerContext> clients = new HashSet<>();
 	@Override
 	public void channelActive(final ChannelHandlerContext ctx) {
-		sendMessage(ctx, "Hello", "World");
-		clients.add(ctx);
-		System.out.println("Sent to: " + ctx.name() + ",Channel ID: " + ctx.channel().id().asLongText());
+		Client client = ClientsManager.addClient(ctx);
+		client.setStatus(ClientStatus.CONNECTED);
+		client.sendMessage(ConnectionMessageType.KEYEXCHANGE, Base64.getEncoder().encodeToString(KeyUtils.publicKey.getEncoded()));
 	}
 	
 	@Override
@@ -26,24 +35,48 @@ public class ConnectionMessageHandler extends ChannelInboundHandlerAdapter{
 	}
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx){
-		clients.remove(ctx);
-		ctx.writeAndFlush("Goodbye").addListener(ChannelFutureListener.CLOSE);
+		ClientsManager.removeClient(ctx);
+		ctx.writeAndFlush("").addListener(ChannelFutureListener.CLOSE);
 	}
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
 		if(!(msg instanceof ConnectionMessage message)){
 			return;
 		}
-		System.out.println("Received type: " +  message.type);
-		for(String s : message.messages){
-			System.out.println("Received message: " + s);
+		DebugOutput.printArray(2, "Received: ", message.messages);
+		if(message.type == ConnectionMessageType.KEYEXCHANGE){
+			byte[] publicBytes = Base64.getDecoder().decode(message.messages[0]);
+			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
+			try{
+				KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+				PublicKey pubKey = keyFactory.generatePublic(keySpec);
+				Client client = ClientsManager.getClient(ctx);
+				client.setPublicKey(pubKey);
+				ClientsManager.getClient(ctx).setStatus(ClientStatus.KEYEXCHANGED);
+			}catch(NoSuchAlgorithmException | InvalidKeySpecException e){
+				DebugOutput.printError("Error while setting public key: " + e.getMessage());
+			}
+		}else if(message.type == ConnectionMessageType.DEBUGENCRYPTED){
+			DebugOutput.printArray(2, "Received encrypted message: ", message.messages);
+			DebugOutput.printArray("Decrypted message: ", decryptMessages(message.messages));
+		}else if(message.type == ConnectionMessageType.REGISTER){
+			RegisterAccountHandler.clientRegisterAccount(ClientsManager.getClient(ctx), KeyUtils.decrypt(message.messages[0]), KeyUtils.decrypt(message.messages[1]));
+			DebugOutput.printArray(1, "Received register message: ", decryptMessages(message.messages));
+		}else if(message.type == ConnectionMessageType.LOGIN){
+			LoginAccountHandler.clientLoginAccount(ClientsManager.getClient(ctx), KeyUtils.decrypt(message.messages[0]), KeyUtils.decrypt(message.messages[1]));
+			DebugOutput.printArray(1, "Received login message: ", decryptMessages(message.messages));
+			
 		}
 	}
-	public void sendMessage(ChannelHandlerContext ctx, String... messages){
-		try{
-			ctx.writeAndFlush(new ConnectionMessage(ConnectionMessageType.LOGIN, messages));
-		}catch(Exception e){
-			e.printStackTrace();
+	public String[] decryptMessages(String[] messages){
+		String[] decryptedMessages = new String[messages.length];
+		for(int i = 0; i < messages.length; i++){
+			try{
+				decryptedMessages[i] = KeyUtils.decrypt(messages[i]);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
+		return decryptedMessages;
 	}
 }

@@ -11,16 +11,14 @@ public class Main {
         KeyUtils.generateKey();
         String encrypt;
         try{
-            encrypt = KeyUtils.encrypt("sussy");
-            System.out.println("PublicKey: " + KeyUtils.publicKey);
-            System.out.println("Encrypt: " + encrypt);
-            System.out.println("Decrypt: " + KeyUtils.decrypt(encrypt));
+            encrypt = KeyUtils.encrypt(KeyUtils.publicKey, "sussy");
+//            System.out.println("PublicKey: " + KeyUtils.publicKey);
+//            System.out.println("Encrypt: " + encrypt);
+//            System.out.println("Decrypt: " + KeyUtils.decrypt(encrypt));
         }catch(Exception e){
             e.printStackTrace();
         }
         ConnectionThread connectionThread = new ConnectionThread(host, port);
         connectionThread.start();
-        
-        System.out.println("test");
     }
 }
