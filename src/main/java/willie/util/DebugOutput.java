@@ -2,7 +2,7 @@ package willie.util;
 
 public class DebugOutput{
 	public static Boolean debug = true;
-	public static int debugLevel = 1;
+	public static int debugLevel = 3;
 	public static void print(String message){
 		if(debug){
 			System.out.println(message);

@@ -2,13 +2,14 @@ package willie.Handler;
 
 import willie.Enum.ClientStatus;
 import willie.Enum.ConnectionMessageType;
+import willie.impl.Account;
 import willie.impl.Client;
+import willie.util.AccountsManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterAccountHandler{
-	public static final Map<String, String> accounts = new HashMap<>();
 	public static void clientRegisterAccount(Client client, String username, String password){
 		if(client.status != ClientStatus.KEYEXCHANGED){
 			client.sendMessage(ConnectionMessageType.DEBUG, "You are not allowed to register an account at this time.");
@@ -46,10 +47,10 @@ public class RegisterAccountHandler{
 			client.sendEncryptedMessage(ConnectionMessageType.REGISTER, "Password must contain at least one letter and one number.");
 			return;
 		}
-		accounts.put(username, password);
+		AccountsManager.addAccount(username, password);
 		client.sendEncryptedMessage(ConnectionMessageType.REGISTER, "Account created successfully.");
 	}
 	public static Boolean accountExists(String username){
-		return accounts.containsKey(username);
+		return AccountsManager.accounts.containsKey(username);
 	}
 }
