@@ -1,6 +1,7 @@
 package willie.util;
 
 import io.netty.channel.ChannelHandlerContext;
+import willie.impl.Account;
 import willie.impl.Client;
 
 import java.util.HashMap;
@@ -26,5 +27,13 @@ public class ClientsManager{
 	}
 	public static Client getClient(ChannelHandlerContext ctx){
 		return clients.get(ctx);
+	}
+	public static Client getClient(Account account){
+		for(Client client : clients.values()){
+			if(client.account == account){
+				return client;
+			}
+		}
+		return null;
 	}
 }

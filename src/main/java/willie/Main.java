@@ -1,6 +1,7 @@
 package willie;
 
 import willie.thread.ConnectionThread;
+import willie.util.AccountsManager;
 import willie.util.KeyUtils;
 
 public class Main {
@@ -8,6 +9,11 @@ public class Main {
     public static int port = 8080;
     
     public static void main(String[] args){
+        AccountsManager.addAccount("willie", "qwer1234");
+        AccountsManager.addAccount("david", "qwer1234");
+        AccountsManager.getAccount("willie").addFriend(AccountsManager.getAccount("david"));
+        AccountsManager.getAccount("david").addFriend(AccountsManager.getAccount("willie"));
+        
         KeyUtils.generateKey();
         String encrypt;
         try{

@@ -4,6 +4,7 @@ import willie.Enum.ConnectionMessageType;
 import willie.impl.Account;
 import willie.impl.Client;
 import willie.util.AccountsManager;
+import willie.util.ClientsManager;
 
 import java.util.Set;
 
@@ -68,6 +69,40 @@ public class FriendMessageHandler{
 			}
 		}else{
 			client.sendEncryptedMessage(ConnectionMessageType.ACCEPTFRIEND, "User does not exist.");
+		}
+	}
+	public static void handleChatWithFriendMessage(Client client, String targetName, String message){
+		Account friend = AccountsManager.getAccount(targetName);
+		Account account = client.account;
+		if(friend != null){
+			if(account.friends.contains(friend)){
+				client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIEND, account.username, message);
+				Client friendClient = ClientsManager.getClient(friend);
+				if(friendClient != null){
+					friendClient.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIEND, account.username, message);
+				}
+				friend.addFriendChatMessage(account, account, message);
+				account.addFriendChatMessage(friend, account, message);
+			}else{
+				client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIENDDEBUG, "You are not friends with " + targetName + ".");
+			}
+		}else{
+			client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIENDDEBUG, "User does not exist.");
+		}
+	}
+	public static void handleFriendChatHistoryMessage(Client client, String friend){
+		Account account = client.account;
+		Account friendAccount = AccountsManager.getAccount(friend);
+		if(account == null){
+			client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIENDDEBUG, "You are not logged in.");
+		}else if(friendAccount == null){
+			client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIENDDEBUG, "User does not exist.");
+		}else if(!account.friends.contains(friendAccount)){
+			client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIENDDEBUG, "You are not friends with " + friend + ".");
+		}else if(account.getChatHistory(friendAccount) == null){
+			client.sendEncryptedMessage(ConnectionMessageType.FRIENDCHATHISTORY);
+		}else{
+			client.sendEncryptedMessage(ConnectionMessageType.FRIENDCHATHISTORY, account.getChatHistory(friendAccount).getChatHistoryString());
 		}
 	}
 }

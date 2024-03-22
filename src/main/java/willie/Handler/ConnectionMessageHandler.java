@@ -30,7 +30,7 @@ public class ConnectionMessageHandler extends ChannelInboundHandlerAdapter{
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-		cause.printStackTrace();
+//		cause.printStackTrace();
 		ctx.close();
 	}
 	@Override
@@ -43,7 +43,9 @@ public class ConnectionMessageHandler extends ChannelInboundHandlerAdapter{
 		if(!(msg instanceof ConnectionMessage message)){
 			return;
 		}
-		DebugOutput.printArray(2, "Received: ", message.messages);
+		if(ClientsManager.getClient(ctx).status != ClientStatus.CONNECTED){
+			DebugOutput.printArray(2, "Received " + message.type.toString() + " : ", KeyUtils.decryptMessages(message.messages));
+		}
 		switch(message.type){
 			case KEYEXCHANGE -> {
 				byte[] publicBytes = Base64.getDecoder().decode(message.messages[0]);
@@ -58,21 +60,17 @@ public class ConnectionMessageHandler extends ChannelInboundHandlerAdapter{
 					DebugOutput.printError("Error while setting public key: " + e.getMessage());
 				}
 			}
-			case DEBUGENCRYPTED -> {
-				DebugOutput.printArray(2, "Received encrypted message: ", message.messages);
-				DebugOutput.printArray("Decrypted message: ", decryptMessages(message.messages));
-			}
+//			case DEBUGENCRYPTED -> {
+//				DebugOutput.printArray("Decrypted message: ", KeyUtils.decryptMessages(message.messages));
+//			}
 			case REGISTER -> {
 				RegisterAccountHandler.clientRegisterAccount(ClientsManager.getClient(ctx), KeyUtils.decrypt(message.messages[0]), KeyUtils.decrypt(message.messages[1]));
-				DebugOutput.printArray(1, "Received REGISTER message: ", decryptMessages(message.messages));
 			}
 			case LOGIN -> {
 				LoginAccountHandler.clientLoginAccount(ClientsManager.getClient(ctx), KeyUtils.decrypt(message.messages[0]), KeyUtils.decrypt(message.messages[1]));
-				DebugOutput.printArray(1, "Received LOGIN message: ", decryptMessages(message.messages));
 			}
 			case ADDFRIEND -> {
 				FriendMessageHandler.handleAddFriendMessage(ClientsManager.getClient(ctx), KeyUtils.decrypt(message.messages[0]));
-				DebugOutput.printArray(1, "Received ADDFRIEND message: ", decryptMessages(message.messages));
 			}
 			case FRIENDLIST -> {
 				FriendMessageHandler.handleFriendListMessage(ClientsManager.getClient(ctx));
@@ -89,17 +87,12 @@ public class ConnectionMessageHandler extends ChannelInboundHandlerAdapter{
 			case ACCEPTFRIEND -> {
 				FriendMessageHandler.handleAcceptFriendMessage(ClientsManager.getClient(ctx), KeyUtils.decrypt(message.messages[0]));
 			}
-		}
-	}
-	public String[] decryptMessages(String[] messages){
-		String[] decryptedMessages = new String[messages.length];
-		for(int i = 0; i < messages.length; i++){
-			try{
-				decryptedMessages[i] = KeyUtils.decrypt(messages[i]);
-			}catch(Exception e){
-				e.printStackTrace();
+			case CHATWITHFRIEND -> {
+				FriendMessageHandler.handleChatWithFriendMessage(ClientsManager.getClient(ctx), KeyUtils.decrypt(message.messages[0]), KeyUtils.decrypt(message.messages[1]));
+			}
+			case FRIENDCHATHISTORY -> {
+				FriendMessageHandler.handleFriendChatHistoryMessage(ClientsManager.getClient(ctx), KeyUtils.decrypt(message.messages[0]));
 			}
 		}
-		return decryptedMessages;
 	}
 }

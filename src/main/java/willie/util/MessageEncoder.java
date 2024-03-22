@@ -29,5 +29,6 @@ public class MessageEncoder extends MessageToByteEncoder<ConnectionMessage>{
 		}
 		
 //		System.out.println("Sent: " + msg.type + " " + Arrays.toString(msg.messages));
+		DebugOutput.printArray(2, "Sent: ", msg.messages);
 	}
 }

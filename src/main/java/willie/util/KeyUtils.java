@@ -6,8 +6,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public class KeyUtils{
@@ -40,5 +38,12 @@ public class KeyUtils{
 		}catch(NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e){
 			throw new RuntimeException(e);
 		}
+	}
+	public static String[] decryptMessages(String[] messages){
+		String[] decryptedMessages = new String[messages.length];
+		for(int i = 0; i < messages.length; i++){
+			decryptedMessages[i] = decrypt(messages[i]);
+		}
+		return decryptedMessages;
 	}
 }

@@ -23,7 +23,6 @@ public class MessageDecoder extends ByteToMessageDecoder{
 		if(in.readableBytes() < totalLength){
 			return;
 		}
-		DebugOutput.print(3, "totalLength: " + totalLength);
 		readingByteAmount = false;
 		int readingBytes = in.readInt();
 		String type = readString(in, readingBytes);
