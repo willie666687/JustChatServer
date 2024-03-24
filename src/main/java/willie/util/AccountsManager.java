@@ -7,9 +7,10 @@ import java.util.Map;
 
 public class AccountsManager{
 	public static Map<String, Account> accounts = new HashMap<>();
-	public static void addAccount(String username, String password){
+	public static Account addAccount(String username, String password){
 		Account account = new Account(username, password);
 		accounts.put(username, account);
+		return account;
 	}
 	public static Account getAccount(String username){
 		return accounts.get(username);

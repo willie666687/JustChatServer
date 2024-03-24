@@ -8,6 +8,9 @@ public class ChatHistory{
 	public void addChatMessage(String message, Account sender){
 		chatHistory.add(new ChatMessage(message, sender));
 	}
+	public void addChatMessage(String message, Account sender, int timestamp){
+		chatHistory.add(new ChatMessage(message, sender, timestamp));
+	}
 	public void addMessage(ChatMessage message){
 		chatHistory.add(message);
 	}

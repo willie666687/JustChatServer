@@ -7,10 +7,13 @@ import java.util.Set;
 
 public class Account{
 	public String username;
-	public Set<Account> friends = new HashSet<>();
-	public Set<Account> friendRequests = new HashSet<>();
+	public transient Set<Account> friends = new HashSet<>();
+	public Set<String> friendsUsername = new HashSet<>();
+	public transient Set<Account> friendRequests = new HashSet<>();
+	public Set<String> friendRequestsUsername = new HashSet<>();
 	private String password;
-	public Map<Account, ChatHistory> chatHistories = new HashMap<>();
+	public transient Map<Account, ChatHistory> chatHistories = new HashMap<>();
+	public Map<String, ChatHistory> chatHistoriesUsername = new HashMap<>();
 	public Account(String username, String password){
 		this.username = username;
 		this.password = password;
@@ -21,18 +24,36 @@ public class Account{
 	}
 	public void addFriendRequest(Account friend){
 		friendRequests.add(friend);
+		friendRequestsUsername.add(friend.username);
 	}
 	public void removeFriendRequest(Account friend){
 		friendRequests.remove(friend);
+		friendRequestsUsername.remove(friend.username);
 	}
 	public void addFriend(Account friend){
 		friends.add(friend);
+		friendsUsername.add(friend.username);
 	}
 	public void removeFriend(Account friend){
 		friends.remove(friend);
+		friendsUsername.remove(friend.username);
 	}
 	public void addChatHistory(Account friend){
-		chatHistories.put(friend, new ChatHistory());
+		if(chatHistories.containsKey(friend)){
+			return;
+		}
+		ChatHistory chatHistory = new ChatHistory();
+		chatHistories.put(friend, chatHistory);
+		chatHistoriesUsername.put(friend.username, chatHistory);
+		friend.addChatHistory(this, chatHistory);
+	}
+	public void addChatHistory(Account friend, ChatHistory chatHistory){
+		if(chatHistories.containsKey(friend)){
+			return;
+		}
+		chatHistories.put(friend, chatHistory);
+		chatHistoriesUsername.put(friend.username, chatHistory);
+		friend.addChatHistory(this, chatHistory);
 	}
 	public ChatHistory getChatHistory(Account friend){
 		return chatHistories.get(friend);
@@ -42,5 +63,11 @@ public class Account{
 			addChatHistory(friend);
 		}
 		chatHistories.get(friend).addChatMessage(message, sender);
+	}
+	public void addFriendChatMessage(Account friend, Account sender, String message, int timestamp){
+		if(!chatHistories.containsKey(friend)){
+			addChatHistory(friend);
+		}
+		chatHistories.get(friend).addChatMessage(message, sender, timestamp);
 	}
 }
