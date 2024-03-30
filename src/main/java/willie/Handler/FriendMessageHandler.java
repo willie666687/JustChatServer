@@ -76,7 +76,7 @@ public class FriendMessageHandler{
 		Account account = client.account;
 		if(friend != null){
 			if(account.friends.contains(friend)){
-//				client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIEND, account.username, message);
+				client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIEND, account.username, message);
 				Client friendClient = ClientsManager.getClient(friend);
 				if(friendClient != null){
 					friendClient.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIEND, account.username, message);
