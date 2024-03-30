@@ -10,16 +10,17 @@ import willie.util.DataManager;
 import willie.util.DebugOutput;
 import willie.util.KeyUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
     public static String host = "127.0.0.1";
-    public static int port = 8080;
+    public static int port;
     
     public static void main(String[] args){
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the host port: ");
+        port = scanner.nextInt();
+        System.out.println();
         DataManager.createFile(DataManager.UserData);
         Object data = DataManager.readData(DataManager.UserData, AccountsManager.accounts);
         if(data != null){
