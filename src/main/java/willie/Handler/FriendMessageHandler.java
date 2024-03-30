@@ -76,12 +76,12 @@ public class FriendMessageHandler{
 		Account account = client.account;
 		if(friend != null){
 			if(account.friends.contains(friend)){
-				client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIEND, account.username, message);
+//				client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIEND, account.username, message);
 				Client friendClient = ClientsManager.getClient(friend);
 				if(friendClient != null){
 					friendClient.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIEND, account.username, message);
 				}
-				friend.addFriendChatMessage(account, account, message);
+//				friend.addFriendChatMessage(account, account, message);
 				account.addFriendChatMessage(friend, account, message);
 			}else{
 				client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIENDDEBUG, "You are not friends with " + targetName + ".");
