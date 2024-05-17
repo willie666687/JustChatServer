@@ -11,6 +11,7 @@ import java.util.Base64;
 public class KeyUtils{
 	protected static PrivateKey privateKey;
 	public static PublicKey publicKey;
+
 	public static void generateKey(){
 		KeyPairGenerator keyPairGenerator;
 		try{
@@ -23,22 +24,26 @@ public class KeyUtils{
 		publicKey = keyPair.getPublic();
 		privateKey = keyPair.getPrivate();
 	}
-	public static String encrypt(PublicKey publicKey, String message) throws Exception {
+
+	public static String encrypt(PublicKey publicKey, String message) throws Exception{
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		
+
 		return Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes(StandardCharsets.UTF_8)));
 	}
-	public static String decrypt(String encryptedMessage) {
+
+	public static String decrypt(String encryptedMessage){
 		Cipher cipher = null;
 		try{
 			cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			cipher.init(Cipher.DECRYPT_MODE, privateKey);
 			return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedMessage)), StandardCharsets.UTF_8);
-		}catch(NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e){
+		}catch(NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException |
+		       InvalidKeyException e){
 			throw new RuntimeException(e);
 		}
 	}
+
 	public static String[] decryptMessages(String[] messages){
 		String[] decryptedMessages = new String[messages.length];
 		for(int i = 0; i < messages.length; i++){

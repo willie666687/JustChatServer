@@ -2,17 +2,14 @@ package willie.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonWriter;
-import willie.impl.Account;
 
-import java.io.*;
-import java.lang.reflect.Type;
-import java.sql.Connection;
-import java.util.Collection;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 public class DataManager{
-	public static File UserData = new File("Data","UserData.txt");
+	public static File UserData = new File("Data", "UserData.txt");
+
 	public static void createFile(File file){
 		try{
 			if(file.getParentFile().mkdirs()){
@@ -28,6 +25,7 @@ public class DataManager{
 			e.printStackTrace();
 		}
 	}
+
 	public static void writeData(File file, Object data){
 		try{
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -40,6 +38,7 @@ public class DataManager{
 			e.printStackTrace();
 		}
 	}
+
 	public static Object readData(File file, Object data){
 		try{
 			Gson gson = new Gson();

@@ -1,8 +1,8 @@
 package willie.Handler;
 
+import willie.Enum.ClientStatus;
 import willie.Enum.ConnectionMessageType;
 import willie.impl.Client;
-import willie.Enum.ClientStatus;
 import willie.util.AccountsManager;
 
 public class LoginAccountHandler{

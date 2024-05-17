@@ -27,6 +27,7 @@ public class FriendMessageHandler{
 			client.sendEncryptedMessage(ConnectionMessageType.ADDFRIEND, "User does not exist.");
 		}
 	}
+
 	public static void handleFriendListMessage(Client client){
 		Set<Account> friends = client.account.friends;
 		if(friends.isEmpty()){
@@ -41,6 +42,7 @@ public class FriendMessageHandler{
 			client.sendEncryptedMessage(ConnectionMessageType.FRIENDLIST, friendNames);
 		}
 	}
+
 	public static void handleFriendRequestMessage(Client client){
 		Set<Account> friendRequests = client.account.friendRequests;
 		if(friendRequests.isEmpty()){
@@ -55,6 +57,7 @@ public class FriendMessageHandler{
 			client.sendEncryptedMessage(ConnectionMessageType.FRIENDREQUEST, friendRequestNames);
 		}
 	}
+
 	public static void handleAcceptFriendMessage(Client client, String argument){
 		Account friend = AccountsManager.getAccount(argument);
 		Account account = client.account;
@@ -71,6 +74,7 @@ public class FriendMessageHandler{
 			client.sendEncryptedMessage(ConnectionMessageType.ACCEPTFRIEND, "User does not exist.");
 		}
 	}
+
 	public static void handleChatWithFriendMessage(Client client, String targetName, String message){
 		Account friend = AccountsManager.getAccount(targetName);
 		Account account = client.account;
@@ -90,6 +94,7 @@ public class FriendMessageHandler{
 			client.sendEncryptedMessage(ConnectionMessageType.CHATWITHFRIENDDEBUG, "User does not exist.");
 		}
 	}
+
 	public static void handleFriendChatHistoryMessage(Client client, String friend){
 		Account account = client.account;
 		Account friendAccount = AccountsManager.getAccount(friend);

@@ -15,23 +15,28 @@ import willie.util.MessageEncoder;
 public class ConnectionThread extends Thread{
 	String host;
 	int port;
+
 	public ConnectionThread(String host, int port){
 		this.host = host;
 		this.port = port;
 	}
+
 	ConnectionMessageHandler serverHandler = new ConnectionMessageHandler();
+
 	@Override
 	public void run(){
 		startServer();
 	}
+
 	EventLoopGroup bossGroup = new NioEventLoopGroup();
 	EventLoopGroup workerGroup = new NioEventLoopGroup();
+
 	public void startServer(){
-		try {
+		try{
 			ServerBootstrap b = new ServerBootstrap();
 			b.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
-					.childHandler(new ChannelInitializer<SocketChannel>() {
+					.childHandler(new ChannelInitializer<SocketChannel>(){
 						@Override
 						public void initChannel(SocketChannel ch){
 							ch.pipeline().addLast(new MessageDecoder(), new MessageEncoder(), serverHandler);
@@ -39,10 +44,10 @@ public class ConnectionThread extends Thread{
 					})
 					.option(ChannelOption.SO_BACKLOG, 128)          // (5)
 					.childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
-			
+
 			// Bind and start to accept incoming connections.
 			ChannelFuture f = b.bind(port).sync(); // (7)
-			
+
 			// Wait until the server socket is closed.
 			// In this example, this does not happen, but you can do that to gracefully
 			// shut down your server.

@@ -22,24 +22,26 @@ import java.util.Base64;
 @ChannelHandler.Sharable
 public class ConnectionMessageHandler extends ChannelInboundHandlerAdapter{
 	@Override
-	public void channelActive(final ChannelHandlerContext ctx) {
+	public void channelActive(final ChannelHandlerContext ctx){
 		Client client = ClientsManager.addClient(ctx);
 		client.setStatus(ClientStatus.CONNECTED);
 		client.sendMessage(ConnectionMessageType.KEYEXCHANGE, Base64.getEncoder().encodeToString(KeyUtils.publicKey.getEncoded()));
 	}
-	
+
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause){
 //		cause.printStackTrace();
 		ctx.close();
 	}
+
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx){
 		ClientsManager.removeClient(ctx);
 		ctx.writeAndFlush("").addListener(ChannelFutureListener.CLOSE);
 	}
+
 	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object msg) {
+	public void channelRead(ChannelHandlerContext ctx, Object msg){
 		if(!(msg instanceof ConnectionMessage message)){
 			return;
 		}

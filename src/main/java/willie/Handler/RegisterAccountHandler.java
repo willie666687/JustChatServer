@@ -2,12 +2,8 @@ package willie.Handler;
 
 import willie.Enum.ClientStatus;
 import willie.Enum.ConnectionMessageType;
-import willie.impl.Account;
 import willie.impl.Client;
 import willie.util.AccountsManager;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class RegisterAccountHandler{
 	public static void clientRegisterAccount(Client client, String username, String password){
@@ -50,6 +46,7 @@ public class RegisterAccountHandler{
 		AccountsManager.addAccount(username, password);
 		client.sendEncryptedMessage(ConnectionMessageType.REGISTER, "Account created successfully.");
 	}
+
 	public static Boolean accountExists(String username){
 		return AccountsManager.accounts.containsKey(username);
 	}
